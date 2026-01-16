@@ -1,10 +1,13 @@
 export interface Arma {
-  id: string; // UUID vindo do Django
+  id: string;
   tipo_armamento: string;
   marca: string;
   modelo: string;
   calibre: string;
   quantidade: number;
+  // Adicione estas duas linhas abaixo:
+  acao: string;
+  pais_origem: string;
 }
 
 export interface Requerimento {

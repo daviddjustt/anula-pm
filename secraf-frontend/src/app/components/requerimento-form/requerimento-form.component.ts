@@ -38,45 +38,61 @@ export class RequerimentoFormComponent implements OnInit {
     this.carregarArmas();
   }
 
-  carregarArmas(): void {
+  carregarArmas() {
     this.apiService.getMinhasArmas().subscribe({
-      next: (res: Arma[]) => { // Tipagem adicionada aqui
-        this.listaArmas = res;
+      next: (res) => {
+        console.log('Dados recebidos:', res); // <--- OLHE O CONSOLE DO NAVEGADOR
+        this.listaArmas = res || []; // Proteção contra null
       },
-      error: (err: any) => { // Tipagem adicionada aqui
-        console.error('Erro ao carregar armas:', err);
+      error: (err) => {
+        console.error('Erro:', err);
+        // Fallback para teste (apague depois)
+        this.listaArmas = [];
       }
     });
   }
+
   toggleArma(id: string): void {
-    const index = this.dados.armas.indexOf(id);
+    // 1. Verificar se o ID existe
+    if (!id) return;
+
+    // 2. Criar uma cópia do array para forçar o Angular a detectar a mudança
+    const armasSelecionadas = [...this.dados.armas];
+
+    const index = armasSelecionadas.indexOf(id);
+
     if (index > -1) {
-      this.dados.armas.splice(index, 1);
+      // Se já existe, remove
+      armasSelecionadas.splice(index, 1);
+      console.log('Removendo arma ID:', id);
     } else {
-      this.dados.armas.push(id);
+      // Se não existe, adiciona
+      armasSelecionadas.push(id);
+      console.log('Adicionando arma ID:', id);
     }
+
+    // 3. Atribuir a cópia de volta ao objeto principal
+    this.dados.armas = armasSelecionadas;
+
+    console.log('Lista de IDs atualizada:', this.dados.armas);
   }
 
-  enviar(): void {
-    const url = 'http://localhost:8000/api/requerimentos/requerimentos/';
 
-    // Garantimos que o array de armas não está vazio antes de enviar
+  enviar(): void {
     if (this.dados.armas.length === 0) {
-      alert('Por favor, selecione ao menos uma arma.');
+      alert('Selecione pelo menos uma arma para o requerimento.');
       return;
     }
 
-    console.log('Enviando dados para o servidor:', this.dados);
+    const url = 'http://localhost:8000/api/requerimentos/requerimentos/';
 
+    // O objeto 'this.dados' já contém o array 'armas' com os IDs selecionados
     this.http.post(url, this.dados).subscribe({
       next: (res) => {
-        alert('Requerimento enviado com sucesso!');
+        alert('Requerimento criado e armas vinculadas com sucesso!');
         this.limparFormulario();
       },
-      error: (err) => {
-        console.error('Erro detalhado do servidor:', err);
-        alert('Erro ao enviar requerimento. Verifique os campos ou o console.');
-      }
+      error: (err) => alert('Erro ao salvar requerimento.')
     });
   }
 
