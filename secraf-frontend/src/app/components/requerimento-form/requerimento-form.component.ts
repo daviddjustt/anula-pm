@@ -30,34 +30,24 @@ export class RequerimentoFormComponent implements OnInit {
   };
 
   constructor(
-    private route: ActivatedRoute,
-    private router: Router,
     private apiService: ApiService,
     private http: HttpClient
   ) {}
 
-  ngOnInit(): void {
-    // Captura o parâmetro 'uuid' da URL configurada na rota
-    this.userUuid = this.route.snapshot.paramMap.get('uuid');
-
-    if (this.userUuid) {
-      this.carregarArmas(this.userUuid);
-    } else {
-      console.warn('Nenhum UUID encontrado na URL');
-      // Opcional: redirecionar caso não tenha UUID
-      // this.router.navigate(['/login']);
-    }
+  ngOnInit() {
+    this.carregarArmas();
   }
 
-  carregarArmas(uuid: string): void {
-    this.apiService.getArmasPorUsuario(uuid).subscribe({
-      next: (res) => {
+  carregarArmas(): void {
+    this.apiService.getMinhasArmas().subscribe({
+      next: (res: Arma[]) => { // Tipagem adicionada aqui
         this.listaArmas = res;
       },
-      error: (err) => console.error('Erro ao buscar armas:', err)
+      error: (err: any) => { // Tipagem adicionada aqui
+        console.error('Erro ao carregar armas:', err);
+      }
     });
   }
-
   toggleArma(id: string): void {
     const index = this.dados.armas.indexOf(id);
     if (index > -1) {

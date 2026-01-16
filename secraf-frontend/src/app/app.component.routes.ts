@@ -13,7 +13,7 @@ export const routes: Routes = [
     component: LoginComponent
   },
   {
-    path: 'requerimento/:uuid',
+    path: 'requerimento',
     component: RequerimentoFormComponent
   }
 ];
